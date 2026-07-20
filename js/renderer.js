@@ -46,17 +46,17 @@ const Renderer = {
 
   _cacheElements() {
     const ids = [
-      'gcoins-display', 'coins-per-sec', 'data-display', 'energy-display',
-      'energy-fill', 'morale-fill', 'morale-value', 'reputation-fill',
-      'reputation-value', 'prestige-mult-display',
-      'hud-coins', 'hud-cps', 'hud-click-power', 'hud-level',
-      'weather-icon', 'weather-name',
-      'click-power-display', 'crit-chance-display',
-      'xp-fill', 'level-display',
+      'val-gcoins', 'coins-per-sec', 'val-data', 'val-energy',
+      'energy-fill', 'morale-fill', 'morale-value', 'rep-fill',
+      'rep-value', 'prestige-mult-display',
+      'weather-icon', 'weather-name', 'weather-effect',
+      'click-power',
+      'xp-fill', 'player-level',
       'save-indicator',
-      'player-avatar', 'player-name', 'player-level',
+      'player-avatar', 'player-name',
       'building-canvas',
       'production-chart',
+      'rate-gcoins', 'rate-data', 'rate-energy',
     ];
 
     ids.forEach(id => {
@@ -104,7 +104,7 @@ const Renderer = {
       }
     };
 
-    this._raf = window.requestAnimationFrame(loop);
+    this._rafId = window.requestAnimationFrame(loop);
   },
 
   /* ─────────────────────────────────────────────
@@ -127,31 +127,27 @@ const Renderer = {
     const el = this.els;
 
     // G-Coins
-    if (el['gcoins-display']) el['gcoins-display'].textContent = G.formatCoins(G.state.gcoins);
-    if (el['hud-coins']) el['hud-coins'].textContent = G.formatCoins(G.state.gcoins);
+    if (el['val-gcoins']) el['val-gcoins'].textContent = G.formatCoins(G.state.gcoins);
+    if (el['rate-gcoins']) el['rate-gcoins'].textContent = '+' + G.formatCoins(G.rates.gcoinsPerSecond) + '/s';
 
     // Production par seconde
     const cps = G.rates.gcoinsPerSecond.toFixed(1);
     if (el['coins-per-sec']) el['coins-per-sec'].textContent = G.formatCoins(G.rates.gcoinsPerSecond) + '/s';
-    if (el['hud-cps'])       el['hud-cps'].textContent       = G.formatCoins(G.rates.gcoinsPerSecond) + '/s';
 
     // Data
-    if (el['data-display']) el['data-display'].textContent = G.formatNum(G.state.data.toFixed(0));
+    if (el['val-data']) el['val-data'].textContent = G.formatNum(G.state.data.toFixed(0));
+    if (el['rate-data']) el['rate-data'].textContent = '+' + G.formatCoins(G.rates.dataPerSecond) + '/s';
 
     // Énergie
-    if (el['energy-display']) el['energy-display'].textContent = `${G.state.energy.toFixed(0)}/${G.CONFIG.MAX_ENERGY}`;
+    if (el['val-energy']) el['val-energy'].textContent = `${G.state.energy.toFixed(0)}/${G.CONFIG.MAX_ENERGY}`;
+    if (el['rate-energy']) el['rate-energy'].textContent = G.formatCoins(G.rates.energyPerSecond) + '/s';
 
     // Clic power
     const cp = G.state.clickPower * G.state.clickMultiplier * G.state.prestigeMultiplier;
-    if (el['click-power-display']) el['click-power-display'].textContent = G.formatNum(Math.ceil(cp));
-    if (el['hud-click-power'])     el['hud-click-power'].textContent     = G.formatNum(Math.ceil(cp));
-
-    // Crit
-    if (el['crit-chance-display']) el['crit-chance-display'].textContent = (G.state.critChance * 100).toFixed(1) + '%';
+    if (el['click-power']) el['click-power'].textContent = '+' + G.formatNum(Math.ceil(cp));
 
     // Niveau
-    if (el['level-display']) el['level-display'].textContent = G.state.level;
-    if (el['hud-level'])     el['hud-level'].textContent     = G.state.level;
+    if (el['player-level']) el['player-level'].textContent = G.state.level;
 
     // Prestige multiplicateur
     if (el['prestige-mult-display']) el['prestige-mult-display'].textContent = `×${G.state.prestigeMultiplier.toFixed(1)}`;
@@ -180,8 +176,8 @@ const Renderer = {
 
     // Barre réputation
     const repPct = Math.min(100, (G.state.reputation / 1000) * 100);
-    if (el['reputation-fill']) el['reputation-fill'].style.width = `${repPct.toFixed(1)}%`;
-    if (el['reputation-value']) el['reputation-value'].textContent = G.state.reputation.toFixed(0);
+    if (el['rep-fill']) el['rep-fill'].style.width = `${repPct.toFixed(1)}%`;
+    if (el['rep-value']) el['rep-value'].textContent = G.state.reputation.toFixed(0);
 
     // XP
     const xpPct = (G.state.xp / G.state.xpToNext) * 100;
@@ -192,7 +188,7 @@ const Renderer = {
      ZONE DE CLIC — G BOUTON
   ───────────────────────────────────────────── */
   updateClickArea() {
-    const btn = document.getElementById('click-button');
+    const btn = document.getElementById('btn-main-click');
     if (!btn) return;
 
     // Aura pulsante si prestige
@@ -209,10 +205,6 @@ const Renderer = {
       transcendent: 'var(--accent-purple)',
     };
     btn.style.borderColor = phaseColors[G.state.phase] || 'var(--accent-blue)';
-
-    // Compteur de clics sur le bouton
-    const clickCountEl = document.getElementById('btn-click-count');
-    if (clickCountEl) clickCountEl.textContent = G.formatNum(G.state.clickCount);
   },
 
   /* ─────────────────────────────────────────────
@@ -236,6 +228,7 @@ const Renderer = {
 
     if (el['weather-icon']) el['weather-icon'].textContent = w.icon;
     if (el['weather-name']) el['weather-name'].textContent = w.label;
+    if (el['weather-effect']) el['weather-effect'].textContent = `×${G.state.weatherBonus.toFixed(1)}`;
   },
 
   /* ─────────────────────────────────────────────

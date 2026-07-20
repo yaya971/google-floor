@@ -37,6 +37,10 @@ const Save = {
   ───────────────────────────────────────────── */
   save() {
     try {
+      // Save current player state in multiplayer mode
+      if (G.state.multiplayerMode && typeof Multiplayer !== 'undefined') {
+        Multiplayer._saveCurrentPlayerState();
+      }
       const saveData = {
         version: '1.0.0',
         timestamp: Date.now(),
@@ -81,6 +85,12 @@ const Save = {
           researchQueue:       G.state.researchQueue,
           researchProgress:    G.state.researchProgress,
           settings:            G.state.settings,
+          multiplayerMode:     G.state.multiplayerMode,
+          players:             G.state.players ? G.state.players.map(p => ({ name: p.name, color: p.color })) : undefined,
+          playerStates:        G.state.multiplayerMode && typeof Multiplayer !== 'undefined'
+                               ? Multiplayer.players.map(p => p.state)
+                               : undefined,
+          currentPlayer:       G.state.currentPlayer,
           lastSaved:           Date.now(),
         },
       };
@@ -133,6 +143,25 @@ const Save = {
       // Réinitialise les états volatils
       G.state.activeEvents = [];
       G.state.phase = G.computePhase();
+
+      // Restore multiplayer state if it was saved
+      if (savedState.multiplayerMode && savedState.playerStates && savedState.players) {
+        G.state.multiplayerMode = true;
+        G.state.players = savedState.players;
+        G.state.currentPlayer = savedState.currentPlayer || 0;
+
+        if (typeof Multiplayer !== 'undefined') {
+          Multiplayer.players = savedState.playerStates.map((state, i) => ({
+            name: savedState.players[i].name,
+            color: savedState.players[i].color,
+            avatar: ['🧑‍💻', '👔', '🤖', '👾'][i % 4],
+            state: state,
+          }));
+          Multiplayer.playerCount = Multiplayer.players.length;
+          Multiplayer.gameActive = true;
+          Multiplayer._loadPlayerState(G.state.currentPlayer);
+        }
+      }
 
       G.recalcRates();
       G.recalcClickPower();
