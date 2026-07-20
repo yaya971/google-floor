@@ -696,7 +696,8 @@
       const btnSettingsMenu = document.getElementById('btn-settings-menu');
       if (btnSettingsMenu) {
         btnSettingsMenu.addEventListener('click', () => {
-          G.continueGame(); // Démarre le jeu si pas démarré
+          const modal = document.getElementById('modal-settings');
+          if (modal) modal.classList.remove('hidden');
         });
       }
 

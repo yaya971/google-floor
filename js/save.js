@@ -308,17 +308,24 @@ const Save = {
     }
 
     // Bouton exporter
-    const btnExport = document.getElementById('btn-export');
+    const btnExport = document.getElementById('btn-export-save');
     if (btnExport) {
       btnExport.addEventListener('click', () => this.exportSave());
     }
 
     // Bouton importer
-    const btnImport = document.getElementById('btn-import');
+    const btnImport = document.getElementById('btn-import-save');
     if (btnImport) {
       btnImport.addEventListener('click', () => {
         const modal = document.getElementById('modal-import');
         if (modal) modal.classList.remove('hidden');
+      });
+    }
+
+    const closeImport = document.getElementById('close-modal-import');
+    if (closeImport) {
+      closeImport.addEventListener('click', () => {
+        document.getElementById('modal-import')?.classList.add('hidden');
       });
     }
 

@@ -59,8 +59,46 @@ const Control = {
     this._bindSearch();
     this._bindBuyMode();
     this._bindBuildingCanvas();
+    this._bindHeaderButtons();
 
     console.log('🎮 Control module initialisé');
+  },
+
+  _bindHeaderButtons() {
+    const btnSave = document.getElementById('btn-save');
+    if (btnSave) {
+      btnSave.addEventListener('click', () => {
+        if (typeof Save !== 'undefined') Save.save();
+        G.showToast('💾 Sauvegardé !', 'info');
+      });
+    }
+
+    const btnSettings = document.getElementById('btn-settings');
+    if (btnSettings) {
+      btnSettings.addEventListener('click', () => {
+        const modal = document.getElementById('modal-settings');
+        if (modal) modal.classList.remove('hidden');
+      });
+    }
+
+    const btnMenuReturn = document.getElementById('btn-menu-return');
+    if (btnMenuReturn) {
+      btnMenuReturn.addEventListener('click', () => {
+        if (confirm('Voulez-vous vraiment retourner au menu principal ? La partie sera sauvegardée.')) {
+          if (typeof Save !== 'undefined') Save.save();
+          document.getElementById('game-container').classList.add('hidden');
+          document.getElementById('main-menu').classList.remove('hidden');
+          G.stopLoop();
+        }
+      });
+    }
+    
+    const btnPrestige = document.getElementById('btn-prestige');
+    if (btnPrestige) {
+      btnPrestige.addEventListener('click', () => {
+        if (G.canPrestige()) G.prestige();
+      });
+    }
   },
 
   _bindBuildingCanvas() {
@@ -149,14 +187,6 @@ const Control = {
     this.lastClickPos = { x, y };
     G.processClick(x, y);
 
-    // Animation du bouton
-    const btn = document.getElementById('btn-main-click');
-    if (btn) {
-      btn.classList.remove('click-pop');
-      void btn.offsetWidth;
-      btn.classList.add('click-pop');
-    }
-    
     // Easter Egg (30 clicks in 2 seconds)
     const now = Date.now();
     this.clickTimestamps.push(now);
