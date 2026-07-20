@@ -40,9 +40,6 @@ const Renderer = {
     this._cacheElements();
     this._startRenderLoop();
     this._bindHoverTooltips();
-    this._cacheElements();
-    this._startRenderLoop();
-    this._bindHoverTooltips();
     this.updateFloorVisuals(); // Init floor visuals
     console.log('🎨 Renderer module initialisé');
   },
@@ -70,13 +67,13 @@ const Renderer = {
   /* ─────────────────────────────────────────────
      BOUCLE DE RENDU (requestAnimationFrame)
   ───────────────────────────────────────────── */
-  _raf: null,
+  _rafId: null,
   _lastRenderTime: 0,
   RENDER_INTERVAL: 100, // ms entre les mises à jour DOM (10 fps pour l'UI)
 
   _startRenderLoop() {
     const loop = (timestamp) => {
-      this._raf = window.requestAnimationFrame(loop);
+      this._rafId = window.requestAnimationFrame(loop);
 
       const delta = timestamp - this._lastRenderTime;
       if (delta < this.RENDER_INTERVAL) return;
@@ -93,7 +90,6 @@ const Renderer = {
 
       // Rendu peu fréquent (tous les 5 frames ≈ 2s)
       if (this.frame % 5 === 0) {
-        this.updateProductionChart();
         this.updateProductionChart();
         this.updateFloorVisuals();
         if (typeof Events !== 'undefined') {

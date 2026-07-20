@@ -419,7 +419,7 @@ G.recalcRates = function() {
   gps *= pm;
 
   // Compétences actives
-  if (st.activeSkills.turbo && st.activeSkills.turbo.active) gps *= 3;
+  if (st.activeSkills.turboClick && st.activeSkills.turboClick.active) gps *= 3;
   if (st.activeSkills.dataBoost && st.activeSkills.dataBoost.active) dps *= 2;
 
   G.rates.gcoinsPerSecond = gps;
@@ -1045,50 +1045,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   // Favicon dynamique
   if (typeof Assets !== 'undefined') Assets.generateFavicon();
 });
-
-/* ─────────────────────────────────────────────
-   MÉTHODES UTILITAIRES SUPPLÉMENTAIRES
-───────────────────────────────────────────── */
-
-/**
- * Ajoute de la Data au joueur.
- */
-G.addData = function(amount) {
-  G.state.data += amount * (G.state.dataMultiplier || 1);
-};
-
-/**
- * Dépense de la Data. Retourne false si insuffisant.
- */
-G.spendData = function(amount) {
-  if (G.state.data < amount) return false;
-  G.state.data -= amount;
-  return true;
-};
-
-/**
- * Formate un temps en secondes en chaîne lisible.
- */
-G.formatTime = function(seconds) {
-  if (seconds === null || seconds === undefined || isNaN(seconds)) return '0s';
-  seconds = Math.max(0, Math.floor(seconds));
-  if (seconds < 60) return `${seconds}s`;
-  if (seconds < 3600) return `${Math.floor(seconds/60)}m ${seconds%60}s`;
-  if (seconds < 86400) return `${Math.floor(seconds/3600)}h ${Math.floor((seconds%3600)/60)}m`;
-  return `${Math.floor(seconds/86400)}j ${Math.floor((seconds%86400)/3600)}h`;
-};
-
-/**
- * Calcule la phase de jeu selon les G-Coins cumulés.
- */
-G.computePhase = function() {
-  const all = G.state.gcoinsAllTime;
-  if (all >= 1e18) return 'transcendent';
-  if (all >= 1e12) return 'expert';
-  if (all >= 1e9)  return 'advanced';
-  if (all >= 1e6)  return 'intermediate';
-  return 'beginner';
-};
 
 /* ─────────────────────────────────────────────
    EXPOSITION GLOBALE (pour debug console)

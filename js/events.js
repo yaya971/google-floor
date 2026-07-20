@@ -402,7 +402,6 @@ const Events = {
     }
 
     eventDef.effect();
-    G.state.totalEventsTriggered++;
 
     if (typeof Achievements !== 'undefined') {
       Achievements.check('events', G.state.totalEventsTriggered);

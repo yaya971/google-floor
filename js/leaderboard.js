@@ -35,25 +35,27 @@ const Leaderboard = {
       const p = prefixes[Math.floor(Math.random() * prefixes.length)];
       const s = suffixes[Math.floor(Math.random() * suffixes.length)];
       const country = countries[Math.floor(Math.random() * countries.length)];
+      const isTop = i < 10;
       const isHighRank = i < 50;
-      const isMidRank = i < 200 && !isHighRank;
-      
-      // Score exponentiel
-      let baseScore = 1e4;
-      if (isHighRank) baseScore = Math.pow(10, 10 + Math.random() * 6); // 1e10 - 1e16
-      else if (isMidRank) baseScore = Math.pow(10, 6 + Math.random() * 4); // 1e6 - 1e10
-      else baseScore = Math.pow(10, 2 + Math.random() * 4); // 1e2 - 1e6
+      const isMidRank = i < 200 && !isTop && !isHighRank;
+
+      // Scores linéaires réalistes (jouable par un humain)
+      let baseScore;
+      if (isTop) baseScore = 1e12 + Math.random() * 5e12; // 1-6 T (top bots)
+      else if (isHighRank) baseScore = 1e10 + Math.random() * 9e11; // 10 G - 1 T
+      else if (isMidRank) baseScore = 1e8 + Math.random() * 9e9; // 100 M - 10 G
+      else baseScore = 1e4 + Math.random() * 1e8; // 10 K - 100 M
 
       this.BOTS.push({
         id: 'bot_' + i,
         name: p + '_' + s,
         avatar: avatars[Math.floor(Math.random() * avatars.length)],
         score: baseScore,
-        prestige: Math.floor(Math.log10(baseScore) / 3),
+        prestige: Math.min(20, Math.floor(Math.log10(baseScore) / 3)),
         country: country
       });
     }
-    
+
     // Sort to have realistic starting positions
     this.BOTS.sort((a, b) => b.score - a.score);
   },
