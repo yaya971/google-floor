@@ -261,7 +261,7 @@ const Upgrades = {
       effect: () => {
         G.state.productionMultiplier *= 1.25;
         G.state.morale = 100;
-        G.state.CONFIG_MORALE_DECAY = G.CONFIG.MORALE_DECAY * 0.5;
+        G.state.moraleDecayMult *= 0.5;
       },
     },
 

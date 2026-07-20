@@ -96,7 +96,7 @@ const Control = {
     const btnPrestige = document.getElementById('btn-prestige');
     if (btnPrestige) {
       btnPrestige.addEventListener('click', () => {
-        if (G.canPrestige()) G.prestige();
+        if (G.canPrestige()) G.doPrestige();
       });
     }
   },
@@ -183,7 +183,7 @@ const Control = {
     }
 
     this.lastClickPos = { x, y };
-    G.processClick(x, y);
+    G.handleClick({ clientX: x, clientY: y });
 
     // Easter Egg (30 clicks in 2 seconds)
     const now = Date.now();

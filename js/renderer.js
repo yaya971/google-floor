@@ -202,7 +202,7 @@ const Renderer = {
       intermediate: 'var(--accent-green)',
       advanced:     'var(--accent-yellow)',
       expert:       'var(--accent-red)',
-      transcendent: 'var(--accent-purple)',
+      singularity:  'var(--accent-purple)',
     };
     btn.style.borderColor = phaseColors[G.state.phase] || 'var(--accent-blue)';
   },
@@ -228,7 +228,7 @@ const Renderer = {
 
     if (el['weather-icon']) el['weather-icon'].textContent = w.icon;
     if (el['weather-name']) el['weather-name'].textContent = w.label;
-    if (el['weather-effect']) el['weather-effect'].textContent = `×${G.state.weatherBonus.toFixed(1)}`;
+    if (el['weather-effect']) el['weather-effect'].textContent = `×${G.getWeatherMultiplier().toFixed(1)}`;
   },
 
   /* ─────────────────────────────────────────────
@@ -371,10 +371,11 @@ const Renderer = {
     // Calculate total entities
     let totalEntities = 0;
     const activeAgents = [];
-    Object.values(G.state.agents).forEach(agent => {
+    Object.entries(G.state.agents).forEach(([id, agent]) => {
       totalEntities += agent.count;
+      const emoji = (typeof Entities !== 'undefined' && Entities.AGENTS[id]?.emoji) || '👨‍💻';
       for(let i=0; i<agent.count; i++) {
-        activeAgents.push(agent.icon || '👨‍💻');
+        activeAgents.push(emoji);
       }
     });
 

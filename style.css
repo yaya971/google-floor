@@ -2142,18 +2142,20 @@ kbd {
   transform: translateY(4px);
   box-shadow: none !important;
 }
-/* ════ MOBILE UI & FLOOR LAYOUT ════ */
-
-#game-main {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  overflow: hidden;
-  margin-top: var(--header-h);
-  margin-bottom: 70px; /* Space for mobile nav */
-  position: relative;
-  background: var(--bg-surface);
-}
+/* ════════════════════════════════
+   MOBILE UI & FLOOR LAYOUT
+════════════════════════════════ */
+@media (max-width: 900px) {
+  #game-main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+    margin-top: var(--header-h);
+    margin-bottom: 70px; /* Space for mobile nav */
+    position: relative;
+    background: var(--bg-surface);
+  }
 
 /* ── FLOOR VIEW ── */
 #floor-view {
@@ -2351,4 +2353,5 @@ kbd {
   0% { transform: scale(0); opacity: 0; }
   80% { transform: scale(1.2); opacity: 1; }
   100% { transform: scale(1); opacity: 1; }
+}
 }

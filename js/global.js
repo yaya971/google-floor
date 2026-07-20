@@ -98,6 +98,7 @@ const G = {
 
     // Moral & météo
     morale: 75,
+    moraleDecayMult: 1,
     weather: 'sunny',
     weatherTimer: 180,
 
@@ -488,7 +489,7 @@ G.tick = function() {
   }
 
   // ── Moral ──
-  const moraleDecay = G.CONFIG.MORALE_DECAY;
+  const moraleDecay = G.CONFIG.MORALE_DECAY * G.state.moraleDecayMult;
   G.state.morale = G.clamp(G.state.morale - moraleDecay * delta, 0, 100);
 
   // ── Météo ──
@@ -513,8 +514,8 @@ G.tick = function() {
   }
 
   // ── Recherche en cours ──
-  if (G.state.researchQueue && typeof Research !== 'undefined') {
-    Research.tick(delta);
+  if (G.state.researchQueue && typeof Upgrades !== 'undefined') {
+    Upgrades.RESEARCH.tick(delta);
   }
 
   // ── Événements actifs (minuterie) ──
@@ -682,6 +683,8 @@ G.showFloatNumber = function(amount, x, y, type = 'normal') {
 
 G.handleClick = function(event) {
   const st = G.state;
+  const target = event?.target || document.getElementById('btn-main-click');
+  const rect = target?.getBoundingClientRect ? target.getBoundingClientRect() : { left: 0, top: 0 };
 
   // Calcul du montant (avec crit)
   let isCrit = false;
@@ -705,15 +708,9 @@ G.handleClick = function(event) {
   st.clickCount++;
 
   // Affichage nombre flottant
-  if (event) {
-    const rect = document.getElementById('btn-main-click').getBoundingClientRect();
-    const x = rect.left + G.rand(-30, 30);
-    const y = rect.top - 10;
-    G.showFloatNumber(amount, x, y, isMega ? 'mega' : isCrit ? 'crit' : 'normal');
-  }
-
-  // Effets visuels gérés via G.showFloatNumber
-  // ...
+  const fx = event?.clientX ?? (rect.left + rect.width / 2);
+  const fy = event?.clientY ?? (rect.top);
+  G.showFloatNumber(amount, fx + G.rand(-30, 30), fy - 10, isMega ? 'mega' : isCrit ? 'crit' : 'normal');
 
   // Sons
   if (typeof Assets !== 'undefined') {
@@ -726,13 +723,16 @@ G.handleClick = function(event) {
   }
 
   // Animation du bouton
-  const btn = document.getElementById('btn-main-click');
+  const btn = event?.target?.closest('[id^="btn-"]') || document.getElementById('btn-main-click');
   if (btn) {
     btn.classList.remove('clicked');
     void btn.offsetWidth; // reflow
     btn.classList.add('clicked');
   }
 };
+
+// Alias pour compatibilité avec control.js
+G.processClick = G.handleClick;
 
 /* ─────────────────────────────────────────────
    PRESTIGE
