@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Google Floor Clicker Call Center — Tycoon/Incremental game. Gérez votre centre d'appels Google, recrutez des agents, améliorez vos technologies et dominez le monde." />
+  <meta name="theme-color" content="#0a0f1e" />
+  <title>Google Floor Clicker — Call Center Tycoon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════
+       ÉCRAN DE CHARGEMENT
+  ══════════════════════════════════════════ -->
+  <div id="loading-screen">
+    <div class="loading-logo">
+      <div class="logo-g">G</div>
+      <div class="loading-title">Floor Clicker</div>
+      <div class="loading-subtitle">Call Center Tycoon</div>
+    </div>
+    <div class="loading-bar-wrap">
+      <div class="loading-bar" id="loading-bar"></div>
+    </div>
+    <div class="loading-text" id="loading-text">Initialisation...</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MENU PRINCIPAL
+  ══════════════════════════════════════════ -->
+  <div id="main-menu" class="hidden">
+    <div class="menu-bg-particles" id="menu-particles"></div>
+    <div class="menu-content">
+      <div class="menu-logo">
+        <span class="logo-g-big">G</span>
+        <div class="menu-title-block">
+          <h1 class="menu-title">Floor Clicker</h1>
+          <p class="menu-subtitle">Call Center Tycoon</p>
+        </div>
+      </div>
+      <div class="menu-version">v1.0.0 — Édition Ultime</div>
+      <div class="menu-buttons">
+        <button class="btn-menu btn-primary" id="btn-new-game">🚀 Nouvelle Partie</button>
+        <button class="btn-menu btn-secondary" id="btn-continue" disabled>▶ Continuer</button>
+        <button class="btn-menu btn-multiplayer" id="btn-multiplayer">👥 Multi-Joueur Local</button>
+        <button class="btn-menu btn-secondary" id="btn-leaderboard-menu">🏆 Classement</button>
+        <button class="btn-menu btn-secondary" id="btn-settings-menu">⚙️ Paramètres</button>
+      </div>
+      <div class="menu-credits">
+        Un jeu de simulation. Pas affilié à Google LLC.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MODAL SÉLECTION JOUEURS (Multijoueur)
+  ══════════════════════════════════════════ -->
+  <div id="modal-players" class="modal hidden">
+    <div class="modal-box">
+      <h2 class="modal-title">👥 Configuration Multi-Joueur</h2>
+      <p class="modal-desc">Choisissez le nombre de joueurs (2-4) qui partageront le même écran.</p>
+      <div class="player-count-buttons">
+        <button class="btn-player-count" data-count="2">2 Joueurs</button>
+        <button class="btn-player-count" data-count="3">3 Joueurs</button>
+        <button class="btn-player-count" data-count="4">4 Joueurs</button>
+      </div>
+      <div id="player-names-section" class="player-names hidden">
+        <!-- Généré dynamiquement -->
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="btn-cancel-multiplayer">Annuler</button>
+        <button class="btn-confirm" id="btn-start-multiplayer">Démarrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       INTERFACE PRINCIPALE DU JEU
+  ══════════════════════════════════════════ -->
+  <div id="game-ui" class="hidden">
+
+    <!-- ── HEADER ── -->
+    <header id="game-header">
+      <div class="header-logo">
+        <span class="logo-g-sm">G</span>
+        <span class="header-title">Floor Clicker</span>
+      </div>
+      <div class="header-resources" id="header-resources">
+        <!-- Rempli dynamiquement par renderer.js -->
+        <div class="resource-pill" id="res-gcoins">
+          <span class="res-icon">💰</span>
+          <span class="res-label">G-Coins</span>
+          <span class="res-value" id="val-gcoins">0</span>
+          <span class="res-rate" id="rate-gcoins">+0/s</span>
+        </div>
+        <div class="resource-pill" id="res-data">
+          <span class="res-icon">📊</span>
+          <span class="res-label">Data</span>
+          <span class="res-value" id="val-data">0</span>
+          <span class="res-rate" id="rate-data">+0/s</span>
+        </div>
+        <div class="resource-pill" id="res-energy">
+          <span class="res-icon">⚡</span>
+          <span class="res-label">Énergie</span>
+          <span class="res-value" id="val-energy">100</span>
+          <span class="res-rate" id="rate-energy">0</span>
+        </div>
+        <div class="resource-pill" id="res-rep">
+          <span class="res-icon">⭐</span>
+          <span class="res-label">Réputation</span>
+          <span class="res-value" id="val-rep">0</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="hdr-btn" id="btn-save" title="Sauvegarder">💾</button>
+        <button class="hdr-btn" id="btn-settings" title="Paramètres">⚙️</button>
+        <button class="hdr-btn" id="btn-menu-return" title="Menu">🏠</button>
+        <div class="player-indicator" id="player-indicator">P1</div>
+      </div>
+    </header>
+
+    <!-- ── ZONE PRINCIPALE ── -->
+    
+    <!-- ── ZONE PRINCIPALE MOBILE ── -->
+    <main id="game-main">
+      
+      <!-- Vue du "Floor" (Bureau) -->
+      <section id="floor-view">
+        <div id="floor-entities">
+          <!-- Les employés apparaîtront ici -->
+        </div>
+        
+        <div class="ceo-desk-container">
+          <button class="btn-click ceo-desk" id="btn-main-click" aria-label="Cliquer pour générer des G-Coins">
+            <span class="click-icon" style="font-size: 3rem;">🧑‍💻</span>
+            <div class="ceo-desk-info">
+              <span class="ceo-name">CEO Desk</span>
+              <span class="click-power" id="click-power">+1</span>
+            </div>
+          </button>
+          <div class="click-sparks" id="click-sparks"></div>
+        </div>
+      </section>
+
+      <!-- HUD superposé au floor -->
+      <div id="floor-hud">
+        <div class="hud-top-left">
+          <div class="player-level">Niv. <span id="player-level">1</span></div>
+          <div class="xp-bar"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+        </div>
+        <div class="hud-top-right">
+          <div class="morale-value">💚 <span id="morale-value">75%</span></div>
+          <div class="weather-display" id="weather-display">
+            <span id="weather-icon">☀️</span> <span id="weather-effect">×1.0</span>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- ── BOTTOM NAVIGATION (APP MOBILE) ── -->
+    <nav id="mobile-bottom-nav">
+      <button class="nav-tab active" data-target="modal-shop">
+        <span class="nav-icon">🛒</span>
+        <span class="nav-label">Boutique</span>
+      </button>
+      <button class="nav-tab" data-target="modal-lab">
+        <span class="nav-icon">🧬</span>
+        <span class="nav-label">Labo</span>
+      </button>
+      <button class="nav-tab" data-target="modal-social">
+        <span class="nav-icon">🏆</span>
+        <span class="nav-label">Social</span>
+      </button>
+      <button class="nav-tab" data-target="modal-settings">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-label">Options</span>
+      </button>
+    </nav>
+
+
+    <!-- ── BARRE DE STATUT BAS ── -->
+    
+
+  </div>
+
+  
+
+  <!-- ════ MOBILE BOTTOM SHEETS (MODALS) ════ -->
+  
+  <div id="modal-shop" class="mobile-modal hidden">
+    <div class="mobile-modal-content">
+      <div class="mobile-modal-header">
+        <h2>🛒 Boutique</h2>
+        <button class="btn-close-modal">✕</button>
+      </div>
+      <div class="mobile-modal-tabs">
+        <button class="m-tab-btn active" data-mtab="m-agents">Agents</button>
+        <button class="m-tab-btn" data-mtab="m-buildings">Bâtiments</button>
+        <button class="m-tab-btn" data-mtab="m-market">Marché</button>
+      </div>
+      <div class="mobile-modal-body">
+        <div id="m-agents" class="m-tab-content active">
+          <div class="inner-tab" id="old-tab-agents">
+            <div class="tab-header">
+              <h2>Recrutement d'Agents</h2>
+              <div class="tab-search"><input type="text" id="agent-search" placeholder="Rechercher un agent..." /></div>
+            </div>
+            <div class="agents-grid" id="agents-grid"></div>
+          </div>
+        </div>
+        <div id="m-buildings" class="m-tab-content hidden">
+          <div class="inner-tab" id="old-tab-buildings">
+            <div class="tab-header"><h2>Bâtiments & Infrastructure</h2></div>
+            <div class="buildings-list" id="buildings-list"></div>
+          </div>
+        </div>
+        <div id="m-market" class="m-tab-content hidden">
+          <div class="inner-tab" id="old-tab-market">
+            <div class="tab-header">
+              <h2>Marché des Ressources</h2>
+              <div class="market-ticker" id="market-ticker"></div>
+            </div>
+            <div class="market-grid" id="market-grid"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-lab" class="mobile-modal hidden">
+    <div class="mobile-modal-content">
+      <div class="mobile-modal-header">
+        <h2>🧬 Laboratoire</h2>
+        <button class="btn-close-modal">✕</button>
+      </div>
+      <div class="mobile-modal-tabs">
+        <button class="m-tab-btn active" data-mtab="m-upgrades">Upgrades</button>
+        <button class="m-tab-btn" data-mtab="m-research">Recherche</button>
+        <button class="m-tab-btn" data-mtab="m-skills">Compétences</button>
+      </div>
+      <div class="mobile-modal-body">
+        <div id="m-upgrades" class="m-tab-content active">
+          <div class="inner-tab" id="old-tab-upgrades">
+            <div class="tab-header">
+              <h2>Améliorations</h2>
+              <div class="upgrade-filters">
+                <button class="filter-btn active" data-filter="all">Tout</button>
+                <button class="filter-btn" data-filter="production">Production</button>
+                <button class="filter-btn" data-filter="click">Clic</button>
+                <button class="filter-btn" data-filter="agent">Agents</button>
+                <button class="filter-btn" data-filter="special">Spécial</button>
+              </div>
+            </div>
+            <div class="upgrades-grid" id="upgrades-grid"></div>
+          </div>
+        </div>
+        <div id="m-research" class="m-tab-content hidden">
+          <div class="inner-tab" id="old-tab-research">
+            <div class="tab-header">
+              <h2>Recherche & Développement</h2>
+              <div class="research-progress-bar">
+                <div class="research-fill" id="research-fill" style="width:0%"></div>
+                <span id="research-label">Aucune recherche active</span>
+              </div>
+            </div>
+            <div class="research-tree" id="research-tree"></div>
+          </div>
+        </div>
+        <div id="m-skills" class="m-tab-content hidden">
+          <div class="skills-panel">
+            <div class="panel-title">⚡ Compétences</div>
+            <div class="skills-grid" id="skills-grid"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-social" class="mobile-modal hidden">
+    <div class="mobile-modal-content">
+      <div class="mobile-modal-header">
+        <h2>🏆 Social & Quêtes</h2>
+        <button class="btn-close-modal">✕</button>
+      </div>
+      <div class="mobile-modal-tabs">
+        <button class="m-tab-btn active" data-mtab="m-quests">Quêtes</button>
+        <button class="m-tab-btn" data-mtab="m-leaderboard">Classement</button>
+        <button class="m-tab-btn" data-mtab="m-events">Événements</button>
+      </div>
+      <div class="mobile-modal-body">
+        <div id="m-quests" class="m-tab-content active">
+          <div class="inner-tab" id="old-tab-quests">
+            <div class="tab-header">
+              <h2>Quêtes & Contrats</h2>
+              <div class="quest-tabs">
+                <button class="qtab-btn active" data-qtab="daily">Quotidien</button>
+                <button class="qtab-btn" data-qtab="main">Principal</button>
+                <button class="qtab-btn" data-qtab="contracts">Contrats</button>
+              </div>
+            </div>
+            <div class="quests-list" id="quests-list"></div>
+          </div>
+        </div>
+        <div id="m-leaderboard" class="m-tab-content hidden">
+          <div class="leaderboard-panel">
+            <div class="panel-title">📊 Classement Local</div>
+            <div class="leaderboard-list" id="leaderboard-list"></div>
+          </div>
+          <div class="mp-scores-panel hidden" id="mp-scores-panel">
+            <div class="panel-title">👥 Scores Joueurs</div>
+            <div class="mp-scores" id="mp-scores"></div>
+            <button class="btn-sm" id="btn-switch-player">Changer de Joueur</button>
+          </div>
+        </div>
+        <div id="m-events" class="m-tab-content hidden">
+          <div class="active-events-panel" id="active-events-panel">
+            <div class="panel-title">⚡ Événements Actifs</div>
+            <div class="events-list" id="active-events-list"></div>
+          </div>
+          <hr>
+          <div class="event-log-panel">
+            <div class="panel-title">📡 Journal Live</div>
+            <div class="event-log" id="event-log">
+              <div class="log-entry log-info">🟢 Système initialisé...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-settings" class="mobile-modal hidden">
+    <div class="mobile-modal-content">
+      <div class="mobile-modal-header">
+        <h2>⚙️ Paramètres & Prestige</h2>
+        <button class="btn-close-modal">✕</button>
+      </div>
+      <div class="mobile-modal-tabs">
+        <button class="m-tab-btn active" data-mtab="m-options">Options</button>
+        <button class="m-tab-btn" data-mtab="m-prestige">Prestige</button>
+        <button class="m-tab-btn" data-mtab="m-minigame">Mini-jeu</button>
+      </div>
+      <div class="mobile-modal-body">
+        <div id="m-options" class="m-tab-content active">
+          <div class="footer-stats" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+            <span>🕐 Session : <span id="session-time">00:00:00</span></span>
+            <span>💾 Sauvegarde : <span id="last-save">Jamais</span></span>
+            <span>📈 Multiplicateur : <span id="global-multiplier">×1.0</span></span>
+            <span>🎯 Phase : <span id="game-phase">Débutant</span></span>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn-sm" id="btn-export-save">Exporter</button>
+            <button class="btn-sm" id="btn-import-save">Importer</button>
+            <button class="btn-sm danger" id="btn-reset">Reset</button>
+          </div>
+        </div>
+        <div id="m-prestige" class="m-tab-content hidden">
+          <div class="inner-tab" id="old-tab-prestige">
+            <div class="tab-header"><h2>✨ Prestige & Réincarnation</h2></div>
+            <div class="prestige-panel" id="prestige-panel">
+              <div class="prestige-info">
+                <div class="prestige-current">Prestige actuel : <span id="prestige-count">0</span></div>
+                <div class="prestige-bonus">Bonus actuel : <span id="prestige-bonus">×1.0</span></div>
+                <div class="prestige-next">Prochain bonus : <span id="prestige-next">×1.1</span></div>
+              </div>
+              <div class="prestige-unlock-list" id="prestige-unlocks"></div>
+              <button class="btn-prestige" id="btn-prestige" disabled>
+                ✨ Effectuer le Prestige
+                <div class="prestige-requirement" id="prestige-req">Requis: 1M G-Coins</div>
+              </button>
+              <div class="prestige-warning">⚠️ Vous perdrez tous vos G-Coins et agents, mais garderez vos bonus permanents.</div>
+            </div>
+          </div>
+        </div>
+        <div id="m-minigame" class="m-tab-content hidden">
+          <div class="minigame-panel" id="minigame-panel">
+            <div class="panel-title">🎮 Mini-Jeu: Appels Rapides</div>
+            <div class="minigame-area" id="minigame-area">
+              <div class="minigame-score">Score: <span id="mg-score">0</span></div>
+              <div class="minigame-field" id="minigame-field">
+                <div class="mg-instructions">Cliquez sur les téléphones qui sonnent !</div>
+              </div>
+              <button class="btn-sm" id="btn-start-minigame">Démarrer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MODALES GLOBALES
+  ══════════════════════════════════════════ -->
+
+  <!-- Modal Succès -->
+  <div id="modal-achievements" class="modal hidden">
+    <div class="modal-box modal-large">
+      <div class="modal-header">
+        <h2>🏆 Tous les Succès</h2>
+        <button class="modal-close" id="close-achievements">✕</button>
+      </div>
+      <div class="achievements-filters">
+        <button class="filter-btn active" data-afilter="all">Tous</button>
+        <button class="filter-btn" data-afilter="unlocked">Débloqués</button>
+        <button class="filter-btn" data-afilter="locked">Verrouillés</button>
+      </div>
+      <div class="achievements-grid" id="all-achievements-grid">
+        <!-- Généré par achievements.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Classement -->
+  <div id="modal-leaderboard" class="modal hidden">
+    <div class="modal-box modal-large">
+      <div class="modal-header">
+        <h2>📊 Classement Global</h2>
+        <button class="modal-close" id="close-leaderboard">✕</button>
+      </div>
+      <div class="leaderboard-tabs">
+        <button class="lbtab active" data-lbtab="alltime">Tout Temps</button>
+        <button class="lbtab" data-lbtab="weekly">Cette Semaine</button>
+        <button class="lbtab" data-lbtab="daily">Aujourd'hui</button>
+      </div>
+      <div class="full-leaderboard" id="full-leaderboard">
+        <!-- Généré par leaderboard.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Paramètres -->
+  <div id="modal-settings" class="modal hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>⚙️ Paramètres</h2>
+        <button class="modal-close" id="close-settings">✕</button>
+      </div>
+      <div class="settings-sections">
+        <div class="setting-group">
+          <h3>🔊 Audio</h3>
+          <label class="setting-row">
+            <span>Musique</span>
+            <input type="range" id="vol-music" min="0" max="1" step="0.01" value="0.3" />
+            <span id="vol-music-val">30%</span>
+          </label>
+          <label class="setting-row">
+            <span>Effets sonores</span>
+            <input type="range" id="vol-sfx" min="0" max="1" step="0.01" value="0.5" />
+            <span id="vol-sfx-val">50%</span>
+          </label>
+          <label class="setting-row">
+            <span>Activer la musique</span>
+            <input type="checkbox" id="toggle-music" checked />
+          </label>
+        </div>
+        <div class="setting-group">
+          <h3>🎨 Affichage</h3>
+          <label class="setting-row">
+            <span>Particules</span>
+            <input type="checkbox" id="toggle-particles" checked />
+          </label>
+          <label class="setting-row">
+            <span>Animations</span>
+            <input type="checkbox" id="toggle-animations" checked />
+          </label>
+          <label class="setting-row">
+            <span>Nombre flottant</span>
+            <input type="checkbox" id="toggle-floatnums" checked />
+          </label>
+        </div>
+        <div class="setting-group">
+          <h3>⌨️ Contrôles</h3>
+          <div class="keybinds-list">
+            <div class="keybind-row"><span>Sauvegarder</span><kbd>Ctrl+S</kbd></div>
+            <div class="keybind-row"><span>Click Turbo</span><kbd>Espace</kbd></div>
+            <div class="keybind-row"><span>Changer joueur</span><kbd>Tab</kbd></div>
+            <div class="keybind-row"><span>Ouvrir succès</span><kbd>A</kbd></div>
+            <div class="keybind-row"><span>Ouvrir classement</span><kbd>L</kbd></div>
+          </div>
+        </div>
+        <div class="setting-group">
+          <h3>👤 Profil</h3>
+          <label class="setting-row">
+            <span>Nom du joueur</span>
+            <input type="text" id="player-name-input" maxlength="20" placeholder="Votre nom..." />
+          </label>
+          <label class="setting-row">
+            <span>Avatar</span>
+            <select id="avatar-select">
+              <option value="🧑‍💻">🧑‍💻 Développeur</option>
+              <option value="👔">👔 CEO</option>
+              <option value="🤖">🤖 IA</option>
+              <option value="👾">👾 Gamer</option>
+              <option value="🦾">🦾 Cyborg</option>
+              <option value="🧙">🧙 Magicien Tech</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-confirm" id="btn-save-settings">Sauvegarder</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast de notification -->
+  <div id="toast-container"></div>
+
+  <!-- Succès popup -->
+  <div id="achievement-popup" class="hidden">
+    <div class="ach-popup-content">
+      <div class="ach-popup-icon" id="ach-popup-icon">🏆</div>
+      <div class="ach-popup-text">
+        <div class="ach-popup-title">Succès Débloqué!</div>
+        <div class="ach-popup-name" id="ach-popup-name">Nom du succès</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nombres flottants container -->
+  <div id="float-numbers"></div>
+
+  <!-- Canvas pour effets de particules -->
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- ══════════════════════════════════════════
+       MODAL OFFLINE EARNINGS
+  ══════════════════════════════════════════ -->
+  <div id="modal-offline" class="modal-overlay hidden">
+    <div class="modal-box" style="max-width:380px;text-align:center">
+      <h2 class="modal-title">💤 Gains Hors Ligne</h2>
+      <p>Vous avez été absent pendant <strong id="offline-time">?</strong></p>
+      <div style="font-size:28px;margin:16px 0">💰 <span id="offline-coins">0</span></div>
+      <div style="font-size:14px;color:var(--text-muted)">📊 <span id="offline-data">0</span> Data collectée</div>
+      <button class="btn-confirm" id="btn-close-offline" style="margin-top:20px;width:100%">🎉 Récupérer !</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MODAL EXPORT SAUVEGARDE
+  ══════════════════════════════════════════ -->
+  <div id="modal-save" class="modal-overlay hidden">
+    <div class="modal-box" style="max-width:480px">
+      <h2 class="modal-title">📤 Exporter la Sauvegarde</h2>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Copiez ce code et conservez-le précieusement :</p>
+      <textarea id="save-textarea" rows="5" style="width:100%;background:var(--bg-elevated);color:var(--text-primary);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:8px;font-family:var(--font-mono);font-size:10px;resize:vertical"></textarea>
+      <div class="modal-actions" style="margin-top:12px">
+        <button class="btn-cancel" id="close-modal-save">Fermer</button>
+        <button class="btn-confirm" id="btn-copy-save">📋 Copier</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MODAL IMPORT SAUVEGARDE
+  ══════════════════════════════════════════ -->
+  <div id="modal-import" class="modal-overlay hidden">
+    <div class="modal-box" style="max-width:480px">
+      <h2 class="modal-title">📥 Importer une Sauvegarde</h2>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Collez votre code de sauvegarde ci-dessous :</p>
+      <textarea id="import-textarea" rows="5" placeholder="Collez ici..." style="width:100%;background:var(--bg-elevated);color:var(--text-primary);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:8px;font-family:var(--font-mono);font-size:10px;resize:vertical"></textarea>
+      <div class="modal-actions" style="margin-top:12px">
+        <button class="btn-cancel" id="close-modal-import">Annuler</button>
+        <button class="btn-confirm" id="btn-confirm-import">📥 Importer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MODAL CLASSEMENT COMPLET
+  ══════════════════════════════════════════ -->
+  <div id="modal-leaderboard" class="modal-overlay hidden">
+    <div class="modal-box" style="max-width:600px;max-height:80vh;overflow-y:auto">
+      <h2 class="modal-title">🏆 Classement Mondial</h2>
+      <div style="display:flex;gap:8px;margin-bottom:16px">
+        <button class="lbtab active" data-lbtab="alltime" style="flex:1;padding:8px;font-size:11px;border:1px solid var(--border-color);background:var(--bg-elevated);color:var(--text-primary);border-radius:var(--radius-sm);cursor:pointer">Tous temps</button>
+        <button class="lbtab" data-lbtab="weekly" style="flex:1;padding:8px;font-size:11px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-secondary);border-radius:var(--radius-sm);cursor:pointer">Semaine</button>
+        <button class="lbtab" data-lbtab="daily" style="flex:1;padding:8px;font-size:11px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-secondary);border-radius:var(--radius-sm);cursor:pointer">Aujourd'hui</button>
+      </div>
+      <div id="full-leaderboard"></div>
+      <div class="modal-actions" style="margin-top:16px">
+        <button class="btn-confirm" id="close-leaderboard" style="width:100%">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MODAL SUCCÈS COMPLETS
+  ══════════════════════════════════════════ -->
+  <div id="modal-achievements" class="modal-overlay hidden">
+    <div class="modal-box" style="max-width:700px;max-height:80vh;overflow-y:auto">
+      <h2 class="modal-title">🏆 Succès <span id="ach-count" style="font-size:14px;color:var(--text-muted)">0/0</span></h2>
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <button onclick="Achievements.renderAllAchievements('all')" style="padding:6px 12px;font-size:11px;border:1px solid var(--border-color);background:var(--bg-elevated);color:var(--text-primary);border-radius:var(--radius-sm);cursor:pointer">Tous</button>
+        <button onclick="Achievements.renderAllAchievements('unlocked')" style="padding:6px 12px;font-size:11px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-secondary);border-radius:var(--radius-sm);cursor:pointer">Débloqués</button>
+        <button onclick="Achievements.renderAllAchievements('locked')" style="padding:6px 12px;font-size:11px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-secondary);border-radius:var(--radius-sm);cursor:pointer">Verrouillés</button>
+      </div>
+      <div id="all-achievements-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px"></div>
+      <div class="modal-actions" style="margin-top:16px">
+        <button class="btn-confirm" onclick="document.getElementById('modal-achievements').classList.add('hidden')" style="width:100%">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MODAL NOUVELLE PARTIE (saisie nom, pays, langue)
+  ══════════════════════════════════════════ -->
+  <div id="modal-new-game" class="modal-overlay hidden">
+    <div class="modal-box" style="max-width:400px;text-align:center">
+      <h2 class="modal-title" data-i18n="setup_title">🚀 Nouvelle Partie</h2>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px" data-i18n="setup_pseudo">Votre Pseudo</p>
+      
+      <input type="text" id="player-name-input" placeholder="CEO..." maxlength="20"
+        style="width:100%;padding:10px 14px;background:var(--bg-elevated);color:var(--text-primary);border:1px solid var(--border-color);border-radius:var(--radius-sm);font-size:14px;font-family:var(--font-ui);margin-bottom:12px"
+      />
+
+      <div style="text-align:left;margin-bottom:6px;font-size:12px;color:var(--text-muted);" data-i18n="setup_country">Pays / Équipe</div>
+      <select id="player-country-input" style="width:100%;padding:10px;background:var(--bg-elevated);color:var(--text-primary);border:1px solid var(--border-color);border-radius:var(--radius-sm);font-size:14px;font-family:var(--font-ui);margin-bottom:12px;outline:none;cursor:pointer">
+        <!-- Dynamically populated by js -->
+      </select>
+
+      <div style="text-align:left;margin-bottom:6px;font-size:12px;color:var(--text-muted);" data-i18n="setup_lang">Langue</div>
+      <select id="player-lang-input" style="width:100%;padding:10px;background:var(--bg-elevated);color:var(--text-primary);border:1px solid var(--border-color);border-radius:var(--radius-sm);font-size:14px;font-family:var(--font-ui);margin-bottom:20px;outline:none;cursor:pointer">
+        <option value="fr">Français 🇫🇷</option>
+        <option value="en">English 🇬🇧</option>
+        <option value="es">Español 🇪🇸</option>
+      </select>
+
+      <div style="display:flex;gap:8px">
+        <button class="btn-cancel" id="btn-cancel-new" style="flex:1">Annuler</button>
+        <button class="btn-confirm btn-play" id="btn-play" style="flex:2" data-i18n="setup_start">🎮 Jouer !</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SCRIPTS — chargement dans l'ordre
+  ══════════════════════════════════════════ -->
+  <script src="js/i18n.js"></script>
+  <script src="js/global.js"></script>
+  <script src="js/assets.js"></script>
+  <script src="js/entities.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/upgrades.js"></script>
+  <script src="js/achievements.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/enemies.js"></script>
+  <script src="js/multiplayer.js"></script>
+  <script src="js/leaderboard.js"></script>
+  <script src="js/control.js"></script>
+  <script src="js/save.js"></script>
+  <script src="js/renderer.js"></script>
+
+  <!-- Script Bootstrap UI (connexions boutons du menu principal) -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Bouton "Nouvelle Partie" → ouvre la modal de saisie de nom
+      const btnNewGame = document.getElementById('btn-new-game');
+      if (btnNewGame) {
+        btnNewGame.addEventListener('click', () => {
+          // Populate country dropdown
+          const countrySelect = document.getElementById('player-country-input');
+          if (countrySelect && countrySelect.children.length === 0 && window.I18n) {
+            window.I18n.I18N_COUNTRIES.forEach(c => {
+              const opt = document.createElement('option');
+              opt.value = c.id;
+              opt.textContent = `${c.emoji} ${c.name}`;
+              countrySelect.appendChild(opt);
+            });
+          }
+          
+          document.getElementById('modal-new-game').classList.remove('hidden');
+          setTimeout(() => document.getElementById('player-name-input').focus(), 100);
+        });
+      }
+
+      // Annuler nouvelle partie
+      const btnCancelNew = document.getElementById('btn-cancel-new');
+      if (btnCancelNew) {
+        btnCancelNew.addEventListener('click', () => {
+          document.getElementById('modal-new-game').classList.add('hidden');
+        });
+      }
+
+      // Continuer partie
+      const btnContinue = document.getElementById('btn-continue');
+      if (btnContinue) {
+        btnContinue.addEventListener('click', () => G.continueGame());
+      }
+
+      // Paramètres depuis le menu
+      const btnSettingsMenu = document.getElementById('btn-settings-menu');
+      if (btnSettingsMenu) {
+        btnSettingsMenu.addEventListener('click', () => {
+          G.continueGame(); // Démarre le jeu si pas démarré
+        });
+      }
+
+      // Classement depuis menu principal
+      const btnLBMenu = document.getElementById('btn-leaderboard-menu');
+      if (btnLBMenu) {
+        btnLBMenu.addEventListener('click', () => {
+          const modal = document.getElementById('modal-leaderboard');
+          if (modal) {
+            modal.classList.remove('hidden');
+            if (typeof Leaderboard !== 'undefined') Leaderboard.renderFull();
+          }
+        });
+      }
+
+      // Enter dans le champ nom
+      const nameInput = document.getElementById('player-name-input');
+      if (nameInput) {
+        nameInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') document.getElementById('btn-play')?.click();
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>
+
