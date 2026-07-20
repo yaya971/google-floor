@@ -2200,7 +2200,6 @@ kbd {
   border: 4px solid var(--google-blue);
   box-shadow: 0 10px 0 var(--google-blue-dark), 0 15px 20px rgba(0,0,0,0.5);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  transition: transform 0.1s, box-shadow 0.1s;
   cursor: pointer;
   touch-action: manipulation;
   user-select: none;

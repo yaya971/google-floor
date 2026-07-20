@@ -137,8 +137,6 @@ const Control = {
 
     btn.addEventListener('pointerdown', (e) => {
       e.preventDefault();
-      // On release capture so it doesn't get stuck if dragged outside
-      btn.releasePointerCapture(e.pointerId);
       
       this.performClick(e.clientX, e.clientY);
       
