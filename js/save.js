@@ -322,13 +322,6 @@ const Save = {
       });
     }
 
-    const closeImport = document.getElementById('close-modal-import');
-    if (closeImport) {
-      closeImport.addEventListener('click', () => {
-        document.getElementById('modal-import')?.classList.add('hidden');
-      });
-    }
-
     // Confirm import
     const btnConfirmImport = document.getElementById('btn-confirm-import');
     if (btnConfirmImport) {
