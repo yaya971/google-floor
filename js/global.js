@@ -222,7 +222,7 @@ G.formatNum = function(n) {
   for (const { v, s } of suffixes) {
     if (abs >= v) return (n / v).toFixed(2) + s;
   }
-  return Math.floor(n).toLocaleString('fr-FR');
+  return Math.floor(n).toString();
 };
 
 /**
@@ -640,17 +640,40 @@ G.showToast = function(message, type = 'info', duration = 3000) {
    NOMBRES FLOTTANTS
 ───────────────────────────────────────────── */
 
-G.showFloatNumber = function(amount, x, y, type = 'normal') {
-  if (!G.state.settings.floatingNumbersEnabled) return;
+G.floatPool = [];
+G.floatPoolIndex = 0;
+G.FLOAT_POOL_SIZE = 50;
+
+G.initFloatPool = function() {
   const container = document.getElementById('float-numbers');
   if (!container) return;
-  const el = document.createElement('div');
-  el.className = `float-num${type === 'crit' ? ' crit' : type === 'mega' ? ' mega' : ''}`;
+  for (let i = 0; i < G.FLOAT_POOL_SIZE; i++) {
+    const el = document.createElement('div');
+    el.className = 'float-num';
+    container.appendChild(el);
+    G.floatPool.push(el);
+  }
+};
+
+G.showFloatNumber = function(amount, x, y, type = 'normal') {
+  if (!G.state.settings.floatingNumbersEnabled) return;
+  if (G.floatPool.length === 0) G.initFloatPool();
+  if (G.floatPool.length === 0) return;
+
+  const el = G.floatPool[G.floatPoolIndex];
+  G.floatPoolIndex = (G.floatPoolIndex + 1) % G.FLOAT_POOL_SIZE;
+
+  el.classList.remove('animate', 'crit', 'mega');
+  void el.offsetWidth;
+  
+  if (type === 'crit') el.classList.add('crit');
+  if (type === 'mega') el.classList.add('mega');
+  
   el.style.left = `${x}px`;
   el.style.top  = `${y}px`;
   el.textContent = `+${G.formatNum(amount)}`;
-  container.appendChild(el);
-  setTimeout(() => el.remove(), 1100);
+  
+  el.classList.add('animate');
 };
 
 /* ─────────────────────────────────────────────

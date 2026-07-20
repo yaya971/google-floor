@@ -97,36 +97,38 @@ const Control = {
     const btn = document.getElementById('btn-main-click');
     if (!btn) return;
 
-    // Clic souris
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('pointerdown', (e) => {
       e.preventDefault();
+      // On release capture so it doesn't get stuck if dragged outside
+      btn.releasePointerCapture(e.pointerId);
+      
       this.performClick(e.clientX, e.clientY);
-    });
-
-    // Touch (mobile)
-    btn.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      const touch = e.touches[0];
-      this.performClick(touch.clientX, touch.clientY);
-    }, { passive: false });
-
-    // Maintien du clic = auto-click rapide
-    btn.addEventListener('mousedown', () => {
+      
       this.isMouseDown = true;
+      clearInterval(this.clickHoldTimer);
       this.clickHoldTimer = setInterval(() => {
         if (this.isMouseDown) this.performClick();
       }, 100);
     });
 
-    btn.addEventListener('mouseup', () => {
+    btn.addEventListener('pointerup', (e) => {
+      e.preventDefault();
       this.isMouseDown = false;
       clearInterval(this.clickHoldTimer);
     });
 
-    btn.addEventListener('mouseleave', () => {
+    btn.addEventListener('pointercancel', (e) => {
       this.isMouseDown = false;
       clearInterval(this.clickHoldTimer);
     });
+
+    btn.addEventListener('pointerleave', (e) => {
+      this.isMouseDown = false;
+      clearInterval(this.clickHoldTimer);
+    });
+    
+    // Prevent default context menu (like long press on mobile)
+    btn.addEventListener('contextmenu', e => e.preventDefault());
   },
 
   clickTimestamps: [],
